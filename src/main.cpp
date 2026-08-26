@@ -3,7 +3,7 @@
 static constexpr uint8_t kLedPin = 21;
 static constexpr uint8_t kBrightness = 16;
 static constexpr uint32_t kBlinkHalfPeriodMs = 500;
-static constexpr uint32_t kStartupDelayMs = 1000;
+static constexpr uint32_t kStartupDelayMs = 3000;
 
 static bool ledOn = false;
 

@@ -7,6 +7,10 @@ static constexpr uint32_t kStartupDelayMs = 3000;
 
 static bool ledOn = false;
 
+static void setLed(uint8_t red, uint8_t green, uint8_t blue) {
+    neopixelWrite(kLedPin, green, red, blue);
+}
+
 void setup() {
     Serial.begin(115200);
     delay(kStartupDelayMs);
@@ -17,9 +21,9 @@ void setup() {
 
 void loop() {
     if (ledOn) {
-        neopixelWrite(kLedPin, kBrightness, 0, 0);
+        setLed(kBrightness, 0, 0);
     } else {
-        neopixelWrite(kLedPin, 0, 0, 0);
+        setLed(0, 0, 0);
     }
     ledOn = !ledOn;
     delay(kBlinkHalfPeriodMs);

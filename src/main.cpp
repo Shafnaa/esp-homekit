@@ -1,4 +1,10 @@
 #include <Arduino.h>
+#include <BLEDevice.h>
+#include <BLEServer.h>
+#include <BLEUtils.h>
+#include <BLEAdvertising.h>
+
+static const char* kDeviceName = "esp-homekit-ble";
 
 static constexpr uint8_t kLedPin = 21;
 static constexpr uint8_t kBrightness = 16;
@@ -17,6 +23,12 @@ void setup() {
     Serial.println();
     Serial.println("[esp-homekit] verification firmware booted");
     Serial.printf("[esp-homekit] built " __DATE__ " " __TIME__ "\n");
+
+    Serial.printf("[esp-homekit] initializing BLE as '%s'\n", kDeviceName);
+    BLEDevice::init(kDeviceName);
+    BLEAdvertising* pAdvertising = BLEDevice::getAdvertising();
+    pAdvertising->start();
+    Serial.println("[esp-homekit] BLE advertising started");
 }
 
 void loop() {

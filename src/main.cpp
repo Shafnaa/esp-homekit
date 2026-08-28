@@ -13,10 +13,26 @@ static constexpr uint32_t kBlinkHalfPeriodMs = 500;
 static constexpr uint32_t kStartupDelayMs = 3000;
 
 static bool ledOn = false;
+static bool deviceConnected = false;
+static BLEServer* pServer = nullptr;
 
 static void setLed(uint8_t red, uint8_t green, uint8_t blue) {
     neopixelWrite(kLedPin, green, red, blue);
 }
+
+class ServerCallbacks : public BLEServerCallbacks {
+    void onConnect(BLEServer* server) override {
+        deviceConnected = true;
+        Serial.println("[esp-homekit] client connected");
+    }
+
+    void onDisconnect(BLEServer* server) override {
+        deviceConnected = false;
+        Serial.println("[esp-homekit] client disconnected; restarting advertising");
+        server->getAdvertising()->start();
+        Serial.println("[esp-homekit] advertising restarted");
+    }
+};
 
 void setup() {
     Serial.begin(115200);
@@ -31,8 +47,8 @@ void setup() {
         return;
     }
 
-    BLEServer* pServer = BLEDevice::createServer();
-    pServer->advertiseOnDisconnect(true);
+    pServer = BLEDevice::createServer();
+    pServer->setCallbacks(new ServerCallbacks());
     BLEService* pService = pServer->createService(kServiceUUID);
     BLECharacteristic* pCharacteristic = pService->createCharacteristic(
         kCharacteristicUUID,

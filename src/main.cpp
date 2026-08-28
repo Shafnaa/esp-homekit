@@ -12,13 +12,24 @@ static constexpr uint8_t kBrightness = 16;
 static constexpr uint32_t kBlinkHalfPeriodMs = 500;
 static constexpr uint32_t kStartupDelayMs = 3000;
 
-static bool ledOn = false;
+static bool deviceState = false;
 static bool deviceConnected = false;
 static BLEServer* pServer = nullptr;
 
 static void setLed(uint8_t red, uint8_t green, uint8_t blue) {
     neopixelWrite(kLedPin, green, red, blue);
 }
+
+class CommandCallbacks : public BLECharacteristicCallbacks {
+    void onWrite(BLECharacteristic* pCharacteristic) override {
+        String value = pCharacteristic->getValue();
+        if (value.length() != 1) {
+            return;
+        }
+        deviceState = (value[0] != 0x00);
+        setLed(deviceState ? kBrightness : 0, 0, 0);
+    }
+};
 
 class ServerCallbacks : public BLEServerCallbacks {
     void onConnect(BLEServer* server) override {
@@ -50,10 +61,10 @@ void setup() {
     pServer = BLEDevice::createServer();
     pServer->setCallbacks(new ServerCallbacks());
     BLEService* pService = pServer->createService(kServiceUUID);
-    BLECharacteristic* pCharacteristic = pService->createCharacteristic(
+    BLECharacteristic* pCommand = pService->createCharacteristic(
         kCharacteristicUUID,
-        BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_WRITE);
-    pCharacteristic->setValue("esp-homekit");
+        BLECharacteristic::PROPERTY_WRITE);
+    pCommand->setCallbacks(new CommandCallbacks());
     pService->start();
 
     BLEAdvertising* pAdvertising = BLEDevice::getAdvertising();
@@ -66,11 +77,6 @@ void setup() {
 }
 
 void loop() {
-    if (ledOn) {
-        setLed(kBrightness, 0, 0);
-    } else {
-        setLed(0, 0, 0);
-    }
-    ledOn = !ledOn;
+    setLed(deviceState ? kBrightness : 0, 0, 0);
     delay(kBlinkHalfPeriodMs);
 }

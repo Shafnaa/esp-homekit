@@ -5,9 +5,10 @@
 HomeKit accessory firmware for the Waveshare ESP32-S3-Zero-M (ESP32-S3FH4R2: 4 MB flash,
 2 MB QSPI PSRAM) built with PlatformIO (`espressif32` platform, Arduino framework).
 
-The scaffold is still being built: `platformio.ini` and `src/` do not exist yet (see open
-tasks in `.issues/open/` before creating files). Canonical build environment name is
-`esp32s3-zero-m` per Task #5.
+The scaffold is in place: `platformio.ini` (env `esp32s3-zero-m`),
+`boards/waveshare_esp32_s3_zero_m.json`, and a BLE verification firmware in `src/main.cpp`.
+See open tasks in `.issues/open/` before adding features. Canonical build environment name
+is `esp32s3-zero-m`.
 
 ## Build & Verify
 
@@ -42,6 +43,14 @@ tasks in `.issues/open/` before creating files). Canonical build environment nam
 
 ## Git
 
-- Work on feature branches and open PRs — do not push directly to `main` even though old
-  history does.
-- Conventional commit messages (`feat(scope):`, `chore:`, `fix:`).
+Full workflow is in `docs/GIT_WORKFLOW.md` (tiered `main → epic → story → task` branches
+mapped to the issue hierarchy, git-only commands). Key rules:
+
+- Never push directly to `main`; open PRs that bubble up task → story → epic → main.
+- Conventional commit messages (`feat(scope):`, `chore:`, `fix:`) with `Refers #<n>`.
+
+## Further reading
+
+- `docs/FLASHING.md` — build, flash, and native-USB monitor procedure.
+- `docs/GIT_WORKFLOW.md` — branch hierarchy and git-only PR flow.
+- `.opencode/skills/issue-management/SKILL.md` — Epic/Story/Task issue conventions.
